@@ -1,10 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiService {
-  // Backend URL - USB ile bağlanan gerçek cihazda adb reverse ile localhost'a bağlanır
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  // Backend URL - Web için canlı sunucu, mobil için localhost
+  static const String _liveBaseUrl = 'https://gelidonia-backend.onrender.com'; // TODO: Burayı Render adresi ile doldur
+  static const String _localBaseUrl = 'http://127.0.0.1:8000';
+  
+  static String get baseUrl {
+    // Eğer web platformundaysak canlı sunucuyu, değilsek (mobil, masaüstü) yerel sunucuyu kullan
+    if (kIsWeb) {
+      return _liveBaseUrl;
+    }
+    return _localBaseUrl;
+  }
   
   // POST isteği ile rota arama
   Future<List<Map<String, dynamic>>> searchRoutes(Map<String, dynamic> tripData) async {
