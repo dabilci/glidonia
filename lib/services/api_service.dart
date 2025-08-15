@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiService {
   // Backend URL - Web için canlı sunucu, mobil için localhost
-  static const String _liveBaseUrl = 'https://gelidonia-backend.onrender.com'; // TODO: Burayı Render adresi ile doldur
+  static const String _liveBaseUrl = 'https://glidonia.onrender.com'; // Canlı backend adresi
   static const String _localBaseUrl = 'http://127.0.0.1:8000';
   
   static String get baseUrl {
