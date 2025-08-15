@@ -5,11 +5,19 @@ on:
     branches:
       - main
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+  
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write      # add this permission
+      id-token: write   # add this permission
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -24,9 +32,22 @@ jobs:
 
       - name: Build web
         run: flutter build web --release --base-href /glidonia/
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          path: ./build/web
+          
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build_and_deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
