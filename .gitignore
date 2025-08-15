@@ -33,6 +33,14 @@ migrate_working_dir/
 .pub/
 /build/
 
+# IDE-specific files
+.idea/
+.vscode/
+
+# Environment variables
+.env
+backend/.env
+
 # Symbolication related
 app.*.symbols
 

@@ -53,6 +53,7 @@ dependencies:
   
   # URL handling
   url_launcher: ^6.2.5
+  gh_pages: ^0.1.1
 
 dev_dependencies:
   flutter_test:
