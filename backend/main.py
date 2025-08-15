@@ -9,8 +9,9 @@ from datetime import datetime, timedelta
 import itertools
 import os
 from dotenv import load_dotenv
-from .config import settings
-from .cache_db import init as init_cache, clear_all
+from config import settings
+from tequila_client import fetch_price_for_date
+from cache_db import init as init_cache, get as cache_get, set as cache_set, clear_all, stats
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -159,7 +160,7 @@ def find_route(payload: RequestPayload):
     # Import here to avoid startup crash if optional deps/env are missing
     # --- FORCE TEQUILA CLIENT ---
     try:
-        from .tequila_client import fetch_price_for_date
+        from tequila_client import fetch_price_for_date
         logger.info("Using forced Kiwi Tequila client")
     except ImportError as e:
         logger.error(f"FATAL: Could not import mandatory Tequila client: {e}")
