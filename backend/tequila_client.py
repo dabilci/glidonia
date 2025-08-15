@@ -5,8 +5,8 @@ from datetime import datetime, timezone
 from collections import deque
 from typing import Optional, Dict, Any, Tuple
 
-from .config import settings
-from .cache_db import get as cache_get, set_cache as cache_set
+from config import settings
+from cache_db import get as cache_get, set_cache
 
 
 logger = logging.getLogger("gelidonia")
@@ -267,14 +267,14 @@ def fetch_price_for_date(origin: str, destination: str, date: str) -> Optional[D
             if items is None: # Explicitly check for None, empty list is valid (no flights)
                 logger.info("RapidAPI response format error or key not found for %s-%s %s using %s.", origin, destination, date, endpoint_path_used)
                 if not getattr(settings, "DISABLE_CACHE", False):
-                    cache_set(f"KIW|{origin}", destination, date, None, fetched_at=int(time.time()))
+                    set_cache(f"KIW|{origin}", destination, date, None, fetched_at=int(time.time()))
                 logger.debug("Tequila client returning None due to format error.")
                 return None # Return None on format error
             
             if not items:
                 logger.info("RapidAPI returned no flight offers for %s-%s on %s using %s.", origin, destination, date, endpoint_path_used)
                 if not getattr(settings, "DISABLE_CACHE", False):
-                    cache_set(f"KIW|{origin}", destination, date, {}, fetched_at=int(time.time())) # Cache empty result
+                    set_cache(f"KIW|{origin}", destination, date, {}, fetched_at=int(time.time())) # Cache empty result
                 logger.debug("Tequila client returning {} due to no flights found in response.")
                 return {} # Return an empty dict to signify "no flights found", not an error
 
@@ -407,7 +407,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str) -> Optional[D
                 logger.info("Leg fetch done %s-%s %s resp_type=%s resp_preview=%s (cheapest of %d offers)", 
                            origin, destination, date, type(cheapest_offer).__name__, str(cheapest_offer)[:240], len(items))
                 if not getattr(settings, "DISABLE_CACHE", False):
-                    cache_set(f"KIW|{origin}", destination, date, cheapest_offer, fetched_at=int(time.time()))
+                    set_cache(f"KIW|{origin}", destination, date, cheapest_offer, fetched_at=int(time.time()))
                 return cheapest_offer
 
             # If loop finishes without finding any valid offer
@@ -419,7 +419,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str) -> Optional[D
             if not items:
                 logger.info("Tequila no offers for %s-%s %s", origin, destination, date)
                 if not getattr(settings, "DISABLE_CACHE", False):
-                    cache_set(f"KIW|{origin}", destination, date, None, fetched_at=int(time.time()))
+                    set_cache(f"KIW|{origin}", destination, date, None, fetched_at=int(time.time()))
                 return None
             offer = items[0]
             # Extract fields
@@ -470,7 +470,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str) -> Optional[D
             }
 
         if not getattr(settings, "DISABLE_CACHE", False):
-            cache_set(f"KIW|{origin}", destination, date, result, fetched_at=int(time.time()))
+            set_cache(f"KIW|{origin}", destination, date, result, fetched_at=int(time.time()))
         return result
 
     except requests.RequestException as e:

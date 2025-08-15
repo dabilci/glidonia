@@ -1,8 +1,8 @@
 import time
 import logging
 import requests
-from .config import settings
-from .cache_db import get as cache_get, set_cache as cache_set
+from config import settings
+from cache_db import get as cache_get, set_cache
 
 logger = logging.getLogger("gelidonia")
 
@@ -69,7 +69,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str):
         
         if not flights_data:
             logger.warning("TP no flights found for %s-%s %s", origin, destination, date)
-            cache_set(origin, destination, date, None, fetched_at=int(time.time()))
+            set_cache(origin, destination, date, None, fetched_at=int(time.time()))
             return None
 
         # Get the cheapest flight
@@ -94,7 +94,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str):
 
         if not cheapest_flight:
             logger.warning("TP no valid price found for %s-%s %s", origin, destination, date)
-            cache_set(origin, destination, date, None, fetched_at=int(time.time()))
+            set_cache(origin, destination, date, None, fetched_at=int(time.time()))
             return None
 
         # Price validation removed - accept all valid prices
@@ -133,7 +133,7 @@ def fetch_price_for_date(origin: str, destination: str, date: str):
             "flight_link": flight_link
         }
         
-        cache_set(origin, destination, date, result, fetched_at=int(time.time()))
+        set_cache(origin, destination, date, result, fetched_at=int(time.time()))
         return result
         
     except Exception as e:
